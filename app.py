@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 
 from crewai import Crew, Process
@@ -27,13 +28,17 @@ st.caption(
 
 
 # -----------------------------
-# Get API Key
+# Get API Key & Set Environment Variable
 # -----------------------------
-api_key = st.secrets.get("GROQ_API_KEY")
+# Retrieve the Gemini API key from Streamlit secrets
+api_key = st.secrets.get("GEMINI_API_KEY")
 
 if not api_key:
-    st.error("GROQ_API_KEY is not configured in Streamlit Secrets.")
+    st.error("GEMINI_API_KEY is not configured in Streamlit Secrets.")
     st.stop()
+
+# Inject into OS environment so LiteLLM and CrewAI can read it automatically
+os.environ["GEMINI_API_KEY"] = api_key
 
 
 # -----------------------------
@@ -54,7 +59,7 @@ with st.sidebar:
 
     language = st.text_input(
         "Programming Language",
-        placeholder="e.g. Python, Java, C++"
+        placeholder="e.g. Python, Flutter, Java"
     )
 
 
@@ -85,7 +90,7 @@ if st.button("Ask CodeMentor AI", type="primary"):
         st.stop()
 
     # -------------------------
-    # User Information
+    # User Information Inputs
     # -------------------------
     inputs = {
         "language": language,
@@ -127,21 +132,17 @@ if st.button("Ask CodeMentor AI", type="primary"):
             # Create Crew
             # ---------------------
             crew = Crew(
-
                 agents=[
                     coding_agent,
                     learning_agent,
                     reviewer_agent
                 ],
-
                 tasks=[
                     coding_task,
                     roadmap_task,
                     review_task
                 ],
-
                 process=Process.sequential,
-
                 verbose=False
             )
 
@@ -159,7 +160,9 @@ if st.button("Ask CodeMentor AI", type="primary"):
         # -------------------------
         st.markdown("## 💡 CodeMentor AI Response")
 
-        st.markdown(str(result))
+        # Handles both string and CrewOutput object formats seamlessly
+        output_text = result.raw if hasattr(result, "raw") else str(result)
+        st.markdown(output_text)
 
 
     except Exception as e:
