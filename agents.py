@@ -1,96 +1,35 @@
+import os
 from crewai import Agent, LLM
 
+def create_agents(api_key: str):
+    # Pass the key to OS environment for LiteLLM routing
+    os.environ["GEMINI_API_KEY"] = api_key
 
-def create_agents(api_key):
-
-    # -----------------------------
-    # Shared LLM
-    # -----------------------------
-    llm = LLM(
-        model="groq/openai/gpt-oss-120b",
-        api_key=api_key,
-        temperature=0.3
+    # Define Gemini 1.5 Flash model
+    gemini_llm = LLM(
+        model="gemini/gemini-1.5-flash",
+        api_key=api_key
     )
 
-
-    # -----------------------------
-    # Agent 1
-    # -----------------------------
     coding_agent = Agent(
-
-        role="Programming Fundamentals Expert",
-
-        goal=(
-            "Explain programming concepts and fundamentals "
-            "clearly to the learner."
-        ),
-
-        backstory=(
-            "You are a patient programming teacher who specializes "
-            "in beginner-friendly explanations and small practical examples."
-        ),
-
-        llm=llm,
-
-        verbose=False,
-
-        allow_delegation=False
+        role="Coding Expert",
+        goal="Explain {language} fundamentals clearly for a {level} learner.",
+        backstory="You are an expert developer who excels at explaining programming syntax and foundational concepts simply.",
+        llm=gemini_llm
     )
 
-
-    # -----------------------------
-    # Agent 2
-    # -----------------------------
     learning_agent = Agent(
-
-        role="Programming Learning Planner",
-
-        goal=(
-            "Create a logical and practical learning roadmap "
-            "for the learner."
-        ),
-
-        backstory=(
-            "You are an experienced programming mentor who organizes "
-            "learning from fundamentals to practical projects."
-        ),
-
-        llm=llm,
-
-        verbose=False,
-
-        allow_delegation=False
+        role="Learning Planner",
+        goal="Design a structured learning roadmap for {language} tailored to a {level} level.",
+        backstory="You are an educational strategist who breaks programming down into actionable, sequential milestones.",
+        llm=gemini_llm
     )
 
-
-    # -----------------------------
-    # Agent 3
-    # -----------------------------
     reviewer_agent = Agent(
-
-        role="Senior Beginner-Friendly Code Mentor",
-
-        goal=(
-            "Review the work of the other agents and produce "
-            "one clear and accurate final response."
-        ),
-
-        backstory=(
-            "You are a senior coding mentor and technical editor. "
-            "You remove confusion, correct unclear explanations, "
-            "and make technical content beginner-friendly."
-        ),
-
-        llm=llm,
-
-        verbose=False,
-
-        allow_delegation=False
+        role="Reviewer Agent",
+        goal="Synthesize explanations and learning roadmaps into a cohesive, beginner-friendly guide.",
+        backstory="You are a technical editor ensuring that concepts and roadmaps flow together without repetition.",
+        llm=gemini_llm
     )
 
-
-    return (
-        coding_agent,
-        learning_agent,
-        reviewer_agent
-    )
+    return coding_agent, learning_agent, reviewer_agent
