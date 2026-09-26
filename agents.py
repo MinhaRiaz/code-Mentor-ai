@@ -7,9 +7,10 @@ def create_agents(api_key: str):
 
     # Define Gemini 1.5 Flash model
     gemini_llm = LLM(
-        model="gemini/gemini-1.5-flash",
-        api_key=api_key
-    )
+    model="gemini/gemini-2.0-flash", # <-- This is the only change
+    api_key=api_key,
+    temperature=0.3
+)
 
     coding_agent = Agent(
         role="Coding Expert",
