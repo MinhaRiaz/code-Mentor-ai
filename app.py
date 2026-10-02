@@ -2,96 +2,126 @@ import os
 import streamlit as st
 
 from crewai import Crew, Process
-
 from agents import create_agents
 from tasks import create_tasks
-
 
 # -----------------------------
 # Page Configuration
 # -----------------------------
 st.set_page_config(
     page_title="CodeMentor AI",
-    page_icon="👨‍💻",
-    layout="wide"
+    page_icon="💻",
+    layout="centered" # Centered for a clean, modern web app feel
 )
 
+# -----------------------------
+# Custom CSS for Modern UI Polish
+# -----------------------------
+st.markdown("""
+    <style>
+    .stTextArea textarea {
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+    }
+    .stSelectbox div[data-baseweb="select"] {
+        border-radius: 12px;
+    }
+    .stTextInput input {
+        border-radius: 12px;
+    }
+    div.stButton > button {
+        width: 100%;
+        border-radius: 12px;
+        height: 52px;
+        font-weight: 600;
+        font-size: 16px;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        color: white;
+        border: none;
+        transition: all 0.2s ease;
+    }
+    div.stButton > button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+    .hero-text {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # -----------------------------
-# App Title
+# Get API Key & Set Environment
 # -----------------------------
-st.title("👨‍💻 CodeMentor AI")
-
-st.caption(
-    "A beginner-friendly Multi-Agent Coding and Learning Assistant"
-)
-
-
-# -----------------------------
-# Get API Key & Set Environment Variable
-# -----------------------------
-# Retrieve the Gemini API key from Streamlit secrets
 api_key = st.secrets.get("GEMINI_API_KEY")
-
 if not api_key:
-    st.error("GEMINI_API_KEY is not configured in Streamlit Secrets.")
+    st.error(":material/key_off: **GEMINI_API_KEY** is not configured in Streamlit Secrets.")
     st.stop()
-
-# Inject into OS environment so LiteLLM and CrewAI can read it automatically
 os.environ["GEMINI_API_KEY"] = api_key
 
-
 # -----------------------------
-# Sidebar
+# Sidebar: Information & Guide
 # -----------------------------
 with st.sidebar:
-
-    st.header("👩‍💻 Learner Profile")
-
-    level = st.selectbox(
-        "Experience Level",
-        [
-            "Complete Beginner",
-            "Beginner",
-            "Intermediate"
-        ]
-    )
-
-    language = st.text_input(
-        "Programming Language",
-        placeholder="e.g. Python, Flutter, Java"
-    )
-
+    st.image("https://cdn-icons-png.flaticon.com/512/4712/4712035.png", width=75)
+    st.title("CodeMentor AI")
+    st.markdown("Your personal, AI-powered programming mentor.")
+    st.divider()
+    st.markdown("### :material/schema: How it works")
+    st.markdown("""
+    1. **:material/code: Coding Expert** writes clear syntax examples.
+    2. **:material/map: Learning Planner** builds a phased roadmap.
+    3. **:material/rate_review: Reviewer** polishes it into a perfect guide.
+    """)
+    st.divider()
+    st.info(":material/workspace_premium: Built for **PakAngel’s Generative AI Hackathon**")
 
 # -----------------------------
-# User Question
+# Main UI: Hero Section
 # -----------------------------
-question = st.text_area(
-    "What do you want to learn?",
-    placeholder=(
-        "Example: I want to learn Python from zero. "
-        "Explain the basics and give me a roadmap."
-    ),
-    height=180
-)
+st.markdown("<div class='hero-text'>", unsafe_allow_html=True)
+st.title(":material/terminal: CodeMentor AI")
+st.markdown("#### Generate a personalized coding roadmap and syntax guide in seconds.")
+st.markdown("</div>", unsafe_allow_html=True)
 
+# -----------------------------
+# Main UI: Input Cards
+# -----------------------------
+with st.container():
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        language = st.text_input(
+            ":material/code: Programming Language",
+            placeholder="e.g. Python, Flutter, JavaScript"
+        )
+        
+    with col2:
+        level = st.selectbox(
+            ":material/leaderboard: Experience Level",
+            ["Complete Beginner", "Beginner", "Intermediate"]
+        )
+
+    question = st.text_area(
+        ":material/chat: What specific concepts do you want to learn?",
+        placeholder="Example: I want to learn Python from zero. Show me variables and loops.",
+        height=120
+    )
 
 # -----------------------------
 # Run Agents
 # -----------------------------
-if st.button("Ask CodeMentor AI", type="primary"):
+if st.button(":material/rocket_launch: Generate My Learning Roadmap", type="primary"):
 
     if not language.strip():
-        st.warning("Please enter a programming language.")
+        st.warning(":material/warning: Please enter a programming language to continue.")
         st.stop()
 
     if not question.strip():
-        st.warning("Please enter your learning question.")
+        st.warning(":material/warning: Please enter your learning question to continue.")
         st.stop()
 
-    # -------------------------
-    # User Information Inputs
-    # -------------------------
     inputs = {
         "language": language,
         "level": level,
@@ -99,83 +129,44 @@ if st.button("Ask CodeMentor AI", type="primary"):
     }
 
     try:
-        # 1. Using st.status for a dynamic hackathon demo UI
-        with st.status("🤖 CodeMentor AI is analyzing your request...", expanded=True) as status:
+        st.divider()
+        # Dynamic Hackathon Demo UI with Material Icons
+        with st.status(":material/smart_toy: **Initializing CodeMentor Agents...**", expanded=True) as status:
             
-            st.write("✅ Loading learner profile and setting up environment...")
+            st.write(":material/check_circle: Loading learner profile and setting up environment...")
+            (coding_agent, learning_agent, reviewer_agent) = create_agents(api_key)
+            (coding_task, roadmap_task, review_task) = create_tasks(coding_agent, learning_agent, reviewer_agent)
+
+            st.write(":material/verified: Coding Expert, Learning Planner, and Reviewer are online.")
             
-            # ---------------------
-            # Create Agents
-            # ---------------------
-            (
-                coding_agent,
-                learning_agent,
-                reviewer_agent
-            ) = create_agents(api_key)
-
-
-            # ---------------------
-            # Create Tasks
-            # ---------------------
-            (
-                coding_task,
-                roadmap_task,
-                review_task
-            ) = create_tasks(
-                coding_agent,
-                learning_agent,
-                reviewer_agent
-            )
-
-            st.write("✅ Initializing Coding Expert, Learning Planner, and Reviewer...")
-
-            # ---------------------
-            # Create Crew
-            # ---------------------
             crew = Crew(
-                agents=[
-                    coding_agent,
-                    learning_agent,
-                    reviewer_agent
-                ],
-                tasks=[
-                    coding_task,
-                    roadmap_task,
-                    review_task
-                ],
+                agents=[coding_agent, learning_agent, reviewer_agent],
+                tasks=[coding_task, roadmap_task, review_task],
                 process=Process.sequential,
                 verbose=False
             )
 
-            st.write("⏳ Agents are collaborating (this usually takes 15-30 seconds)...")
-
-            # ---------------------
-            # Run Crew
-            # ---------------------
-            result = crew.kickoff(
-                inputs=inputs
-            )
+            st.write(":material/hourglass_top: Agents are drafting your custom curriculum (approx. 15-20 seconds)...")
+            result = crew.kickoff(inputs=inputs)
             
-            # 2. Update the status container when finished
-            status.update(label="✨ Learning Roadmap Complete!", state="complete", expanded=False)
-
+            status.update(label=":material/auto_awesome: Learning Roadmap Complete!", state="complete", expanded=False)
 
         # -------------------------
         # Display Final Result
         # -------------------------
-        st.markdown("## 💡 CodeMentor AI Response")
-
-        # Handles both string and CrewOutput object formats seamlessly
-        output_text = result.raw if hasattr(result, "raw") else str(result)
-        st.markdown(output_text)
-
+        with st.container():
+            st.markdown("### :material/school: Your Personalized Guide")
+            output_text = result.raw if hasattr(result, "raw") else str(result)
+            
+            st.info(":material/tips_and_updates: Here is the combined output from your AI mentors:")
+            st.markdown(output_text)
 
     except Exception as e:
         error_msg = str(e)
-        if "503" in error_msg or "high demand" in error_msg:
-            st.warning("🚦 Google's AI servers are currently experiencing high traffic. This is a temporary spike.")
-            if st.button("🔄 Retry Request"):
+        if "503" in error_msg or "high demand" in error_msg or "UNAVAILABLE" in error_msg:
+            st.warning(":material/traffic: Google's AI servers are currently experiencing high traffic.")
+            if st.button(":material/refresh: Retry Request"):
                 st.rerun()
         else:
-            st.error("Something went wrong.")
+            st.error(":material/error: Something went wrong.")
             st.code(error_msg)
