@@ -70,6 +70,7 @@ CodeMentor_AI/
 │
 └── .streamlit/
     └── secrets.toml       # Environment variables (not tracked in Git)
+    
 🤝 Contributing
 Contributions, issues, and feature requests are welcome!
 If you would like to expand this project (e.g., integrating n8n webhooks for course delivery automation, or adding code execution environments), feel free to submit a pull request.
