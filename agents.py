@@ -6,11 +6,12 @@ def create_agents(api_key: str):
     os.environ["GEMINI_API_KEY"] = api_key
 
     # Define Gemini 1.5 Flash model
+    # Inside your agents.py file:
     gemini_llm = LLM(
-    model="gemini/gemini-3.8-flash", # <-- This is the only change
-    api_key=api_key,
-    temperature=0.3
-)
+        model="gemini/gemini-1.5-flash", # Switch to 1.5-flash or 2.5-flash
+        api_key=api_key,
+        temperature=0.3
+    )
 
     coding_agent = Agent(
         role="Coding Expert",
