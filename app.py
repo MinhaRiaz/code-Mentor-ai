@@ -99,11 +99,11 @@ if st.button("Ask CodeMentor AI", type="primary"):
     }
 
     try:
-
-        with st.spinner(
-            "🤖 The three AI agents are working together..."
-        ):
-
+        # 1. Using st.status for a dynamic hackathon demo UI
+        with st.status("🤖 CodeMentor AI is analyzing your request...", expanded=True) as status:
+            
+            st.write("✅ Loading learner profile and setting up environment...")
+            
             # ---------------------
             # Create Agents
             # ---------------------
@@ -127,6 +127,7 @@ if st.button("Ask CodeMentor AI", type="primary"):
                 reviewer_agent
             )
 
+            st.write("✅ Initializing Coding Expert, Learning Planner, and Reviewer...")
 
             # ---------------------
             # Create Crew
@@ -146,6 +147,7 @@ if st.button("Ask CodeMentor AI", type="primary"):
                 verbose=False
             )
 
+            st.write("⏳ Agents are collaborating (this usually takes 15-30 seconds)...")
 
             # ---------------------
             # Run Crew
@@ -153,6 +155,9 @@ if st.button("Ask CodeMentor AI", type="primary"):
             result = crew.kickoff(
                 inputs=inputs
             )
+            
+            # 2. Update the status container when finished
+            status.update(label="✨ Learning Roadmap Complete!", state="complete", expanded=False)
 
 
         # -------------------------
@@ -166,11 +171,8 @@ if st.button("Ask CodeMentor AI", type="primary"):
 
 
     except Exception as e:
-
         st.error("Something went wrong.")
-
         st.code(str(e))
-
         st.info(
             "If this is a dependency or provider error, "
             "check the Streamlit deployment logs."
