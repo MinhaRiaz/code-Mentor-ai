@@ -171,9 +171,11 @@ if st.button("Ask CodeMentor AI", type="primary"):
 
 
     except Exception as e:
-        st.error("Something went wrong.")
-        st.code(str(e))
-        st.info(
-            "If this is a dependency or provider error, "
-            "check the Streamlit deployment logs."
-        )
+        error_msg = str(e)
+        if "503" in error_msg or "high demand" in error_msg:
+            st.warning("🚦 Google's AI servers are currently experiencing high traffic. This is a temporary spike.")
+            if st.button("🔄 Retry Request"):
+                st.rerun()
+        else:
+            st.error("Something went wrong.")
+            st.code(error_msg)
