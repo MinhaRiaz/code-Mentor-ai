@@ -107,7 +107,6 @@ with st.sidebar:
     🟣 **Reviewer:** Polishes the final guide.
     """)
     st.divider()
-    st.success(":material/workspace_premium: **PakAngel’s Hackathon Build**")
 
 # -----------------------------
 # Main UI: Hero Section
