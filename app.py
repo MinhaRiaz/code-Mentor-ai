@@ -10,7 +10,7 @@ from tasks import create_tasks
 # -----------------------------
 st.set_page_config(
     page_title="CodeMentor AI",
-    page_icon="💻",
+    page_icon="https://cdn-icons-png.flaticon.com/512/4712/4712035.png",
     layout="centered" 
 )
 
