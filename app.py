@@ -10,7 +10,7 @@ from tasks import create_tasks
 # -----------------------------
 st.set_page_config(
     page_title="CodeMentor AI",
-    page_icon="logo.png", # Points to your custom gradient image file
+    page_icon="https://cdn-icons-png.flaticon.com/512/4712/4712035.png", # Points to your custom gradient image file
     layout="centered" 
 )
 
@@ -102,7 +102,7 @@ os.environ["GEMINI_API_KEY"] = api_key
 # Sidebar: Colorful Information Guide
 # -----------------------------
 with st.sidebar:
-    st.markdown("<div class='sidebar-logo'><span class='material-symbols-rounded' style='font-size: 80px;'>hub</span></div>", unsafe_allow_html=True)
+    st.image("https://cdn-icons-png.flaticon.com/512/4712/4712035.png", width=90)
     st.markdown("## CodeMentor AI")
     st.markdown("Your personal, AI-powered programming mentor.")
     st.divider()
