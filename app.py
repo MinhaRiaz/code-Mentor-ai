@@ -19,9 +19,15 @@ st.set_page_config(
 # -----------------------------
 st.markdown("""
     <style>
-    /* Glowing Title Gradient */
+    /* Unified Gradient for Title and Button */
+    :root {
+        --brand-gradient: linear-gradient(45deg, #FF512F 0%, #DD2476 100%);
+        --brand-color: #DD2476;
+    }
+
+    /* Glowing Title */
     .title-gradient {
-        background: linear-gradient(to right, #ff00cc, #3333ff, #00d2ff);
+        background: var(--brand-gradient);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-size: 3.5rem;
@@ -37,14 +43,14 @@ st.markdown("""
         margin-bottom: 2rem;
     }
     
-    /* Vibrant Sunset Action Button */
+    /* Main Action Button */
     div.stButton > button {
         width: 100%;
         border-radius: 12px;
         height: 55px;
         font-weight: 800;
         font-size: 18px;
-        background: linear-gradient(45deg, #FF512F 0%, #DD2476 100%);
+        background: var(--brand-gradient);
         color: white;
         border: none;
         box-shadow: 0 4px 15px rgba(221, 36, 118, 0.4);
@@ -63,7 +69,7 @@ st.markdown("""
         transition: border-color 0.3s;
     }
     .stTextArea textarea:focus {
-        border-color: #DD2476;
+        border-color: var(--brand-color);
         box-shadow: 0 0 10px rgba(221, 36, 118, 0.2);
     }
     .stTextInput input, .stSelectbox div[data-baseweb="select"] {
@@ -73,9 +79,9 @@ st.markdown("""
     
     /* Output Card Polish */
     .output-header {
-        color: #DD2476;
+        color: var(--brand-color);
         font-weight: 800;
-        border-bottom: 2px solid #DD2476;
+        border-bottom: 2px solid var(--brand-color);
         padding-bottom: 10px;
         margin-top: 30px;
         margin-bottom: 20px;
