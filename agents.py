@@ -8,7 +8,7 @@ def create_agents(api_key: str):
     # Define Gemini 1.5 Flash model
     # Inside your agents.py file:
     gemini_llm = LLM(
-        model="gemini/gemini-3.8-flash", 
+        model="gemini/gemini-3.5-flash-lite", 
         api_key=api_key,
         temperature=0.3
     )
