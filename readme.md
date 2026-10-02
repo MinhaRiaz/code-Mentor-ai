@@ -1,4 +1,4 @@
-👨‍💻 CodeMentor AI
+"https://cdn-icons-png.flaticon.com/512/4712/4712035.png" CodeMentor AI
 CodeMentor AI is a multi-agent educational platform that generates highly personalized programming roadmaps and beginner-friendly syntax guides in seconds.
 
 Built for the PakAngel’s Generative AI Hackathon, this application leverages agentic orchestration to replace generic tutorials with customized, phased learning paths tailored exactly to a user's experience level and goals.
