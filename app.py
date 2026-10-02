@@ -10,43 +10,75 @@ from tasks import create_tasks
 # -----------------------------
 st.set_page_config(
     page_title="CodeMentor AI",
-    page_icon="💻",
-    layout="centered" # Centered for a clean, modern web app feel
+    page_icon="👨‍💻",
+    layout="centered" 
 )
 
 # -----------------------------
-# Custom CSS for Modern UI Polish
+# Custom CSS for Vibrant, Colorful UI
 # -----------------------------
 st.markdown("""
     <style>
-    .stTextArea textarea {
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
+    /* Glowing Title Gradient */
+    .title-gradient {
+        background: linear-gradient(to right, #ff00cc, #3333ff, #00d2ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 3.5rem;
+        font-weight: 900;
+        text-align: center;
+        margin-bottom: 0px;
+        padding-bottom: 10px;
     }
-    .stSelectbox div[data-baseweb="select"] {
-        border-radius: 12px;
+    .hero-subtitle {
+        text-align: center;
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 2rem;
     }
-    .stTextInput input {
-        border-radius: 12px;
-    }
+    
+    /* Vibrant Sunset Action Button */
     div.stButton > button {
         width: 100%;
         border-radius: 12px;
-        height: 52px;
-        font-weight: 600;
-        font-size: 16px;
-        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        height: 55px;
+        font-weight: 800;
+        font-size: 18px;
+        background: linear-gradient(45deg, #FF512F 0%, #DD2476 100%);
         color: white;
         border: none;
-        transition: all 0.2s ease;
+        box-shadow: 0 4px 15px rgba(221, 36, 118, 0.4);
+        transition: all 0.3s ease;
     }
     div.stButton > button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(221, 36, 118, 0.6);
+        color: white;
     }
-    .hero-text {
-        text-align: center;
-        margin-bottom: 2rem;
+
+    /* Soft Inputs with Colorful Focus Rings */
+    .stTextArea textarea {
+        border-radius: 12px;
+        border: 2px solid #f0f0f0;
+        transition: border-color 0.3s;
+    }
+    .stTextArea textarea:focus {
+        border-color: #DD2476;
+        box-shadow: 0 0 10px rgba(221, 36, 118, 0.2);
+    }
+    .stTextInput input, .stSelectbox div[data-baseweb="select"] {
+        border-radius: 12px;
+        border: 2px solid #f0f0f0;
+    }
+    
+    /* Output Card Polish */
+    .output-header {
+        color: #DD2476;
+        font-weight: 800;
+        border-bottom: 2px solid #DD2476;
+        padding-bottom: 10px;
+        margin-top: 30px;
+        margin-bottom: 20px;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -61,29 +93,27 @@ if not api_key:
 os.environ["GEMINI_API_KEY"] = api_key
 
 # -----------------------------
-# Sidebar: Information & Guide
+# Sidebar: Colorful Information Guide
 # -----------------------------
 with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/4712/4712035.png", width=75)
-    st.title("CodeMentor AI")
+    st.image("https://cdn-icons-png.flaticon.com/512/4712/4712035.png", width=90)
+    st.markdown("## CodeMentor AI")
     st.markdown("Your personal, AI-powered programming mentor.")
     st.divider()
-    st.markdown("### :material/schema: How it works")
+    st.markdown("### :material/schema: The AI Crew")
     st.markdown("""
-    1. **:material/code: Coding Expert** writes clear syntax examples.
-    2. **:material/map: Learning Planner** builds a phased roadmap.
-    3. **:material/rate_review: Reviewer** polishes it into a perfect guide.
+    🟢 **Coding Expert:** Writes your syntax.\n
+    🔵 **Learning Planner:** Builds the roadmap.\n
+    🟣 **Reviewer:** Polishes the final guide.
     """)
     st.divider()
-    st.info(":material/workspace_premium: Built for **PakAngel’s Generative AI Hackathon**")
+    st.success(":material/workspace_premium: **PakAngel’s Hackathon Build**")
 
 # -----------------------------
 # Main UI: Hero Section
 # -----------------------------
-st.markdown("<div class='hero-text'>", unsafe_allow_html=True)
-st.title(":material/terminal: CodeMentor AI")
-st.markdown("#### Generate a personalized coding roadmap and syntax guide in seconds.")
-st.markdown("</div>", unsafe_allow_html=True)
+st.markdown("<h1 class='title-gradient'>CodeMentor AI</h1>", unsafe_allow_html=True)
+st.markdown("<div class='hero-subtitle'>Generate a highly personalized coding roadmap and syntax guide in seconds.</div>", unsafe_allow_html=True)
 
 # -----------------------------
 # Main UI: Input Cards
@@ -146,7 +176,7 @@ if st.button(":material/rocket_launch: Generate My Learning Roadmap", type="prim
                 verbose=False
             )
 
-            st.write(":material/hourglass_top: Agents are drafting your custom curriculum (approx. 15-20 seconds)...")
+            st.write(":material/hourglass_top: Agents are collaborating to build your curriculum...")
             result = crew.kickoff(inputs=inputs)
             
             status.update(label=":material/auto_awesome: Learning Roadmap Complete!", state="complete", expanded=False)
@@ -154,17 +184,19 @@ if st.button(":material/rocket_launch: Generate My Learning Roadmap", type="prim
         # -------------------------
         # Display Final Result
         # -------------------------
-        with st.container():
-            st.markdown("### :material/school: Your Personalized Guide")
-            output_text = result.raw if hasattr(result, "raw") else str(result)
-            
-            st.info(":material/tips_and_updates: Here is the combined output from your AI mentors:")
-            st.markdown(output_text)
+        st.markdown("<h2 class='output-header'>🎓 Your Personalized Guide</h2>", unsafe_allow_html=True)
+        
+        output_text = result.raw if hasattr(result, "raw") else str(result)
+        
+        st.info(":material/tips_and_updates: Here is the masterclass combined from your three AI mentors:")
+        
+        # Displaying the main AI output
+        st.markdown(output_text)
 
     except Exception as e:
         error_msg = str(e)
         if "503" in error_msg or "high demand" in error_msg or "UNAVAILABLE" in error_msg:
-            st.warning(":material/traffic: Google's AI servers are currently experiencing high traffic.")
+            st.warning(":material/traffic: Google's AI servers are currently experiencing high traffic. Please try again.")
             if st.button(":material/refresh: Retry Request"):
                 st.rerun()
         else:
