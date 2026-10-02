@@ -29,7 +29,7 @@ Frontend: Streamlit (Python) + Custom CSS + Google Material Icons
 
 Agent Framework: CrewAI (Process.sequential)
 
-LLM Provider: Google Gemini API (gemini-2.5-flash / gemini-1.5-flash) via crewai[google-genai] integration
+LLM Provider: Google Gemini API (gemini-3.5-flash-lite) via crewai[google-genai] integration
 
 Deployment: Streamlit Community Cloud
 
