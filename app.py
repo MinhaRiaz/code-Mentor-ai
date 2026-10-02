@@ -19,10 +19,10 @@ st.set_page_config(
 # -----------------------------
 st.markdown("""
     <style>
-    /* Unified Gradient for Title and Button */
+    /* Unified Purple/Blue/Cyan Gradient for Title and Button */
     :root {
-        --brand-gradient: linear-gradient(45deg, #FF512F 0%, #DD2476 100%);
-        --brand-color: #DD2476;
+        --brand-gradient: linear-gradient(45deg, #ff00cc, #3333ff, #00d2ff);
+        --brand-color: #3333ff;
     }
 
     /* Glowing Title */
@@ -53,12 +53,12 @@ st.markdown("""
         background: var(--brand-gradient);
         color: white;
         border: none;
-        box-shadow: 0 4px 15px rgba(221, 36, 118, 0.4);
+        box-shadow: 0 4px 15px rgba(51, 51, 255, 0.4);
         transition: all 0.3s ease;
     }
     div.stButton > button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(221, 36, 118, 0.6);
+        box-shadow: 0 6px 20px rgba(51, 51, 255, 0.6);
         color: white;
     }
 
@@ -70,7 +70,7 @@ st.markdown("""
     }
     .stTextArea textarea:focus {
         border-color: var(--brand-color);
-        box-shadow: 0 0 10px rgba(221, 36, 118, 0.2);
+        box-shadow: 0 0 10px rgba(51, 51, 255, 0.2);
     }
     .stTextInput input, .stSelectbox div[data-baseweb="select"] {
         border-radius: 12px;
