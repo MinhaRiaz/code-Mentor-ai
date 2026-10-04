@@ -23,6 +23,21 @@ st.markdown("""
         --brand-gradient: linear-gradient(45deg, #ff00cc, #3333ff, #00d2ff);
         --brand-color: #3333ff;
     }
+    
+    /* Modern Mesh Background */
+    .stApp {
+        background-color: #0b0f19;
+        background-image: 
+            radial-gradient(at 18% 15%, rgba(99, 102, 241, 0.25) 0px, transparent 50%),
+            radial-gradient(at 80% 20%, rgba(168, 85, 247, 0.2) 0px, transparent 50%),
+            radial-gradient(at 40% 80%, rgba(14, 165, 233, 0.2) 0px, transparent 50%);
+        background-attachment: fixed;
+    }
+    
+    /* Adjust Text Colors for Dark Theme */
+    .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp label, .stApp span {
+        color: #e2e8f0 !important;
+    }
 
     /* Glowing Title */
     .title-gradient {
@@ -38,7 +53,7 @@ st.markdown("""
     .hero-subtitle {
         text-align: center;
         font-size: 1.1rem;
-        color: #888899;
+        color: #94a3b8 !important; /* Lighter subtitle color for dark bg */
         margin-bottom: 2rem;
         letter-spacing: 1px;
         font-weight: 600;
@@ -47,15 +62,27 @@ st.markdown("""
     /* Input Styling */
     .stTextArea textarea, .stTextInput input {
         border-radius: 12px;
-        border: 2px solid #2b2b36;
-        transition: border-color 0.3s;
+        border: 2px solid #334155;
+        background-color: rgba(30, 41, 59, 0.7); /* Slightly transparent dark inputs */
+        color: #f8fafc;
+        transition: border-color 0.3s, background-color 0.3s;
     }
     .stTextArea textarea:focus, .stTextInput input:focus {
         border-color: var(--brand-color);
-        box-shadow: 0 0 10px rgba(51, 51, 255, 0.2);
+        background-color: rgba(30, 41, 59, 1);
+        box-shadow: 0 0 10px rgba(51, 51, 255, 0.4);
     }
+    
+    /* Selectbox Styling */
     .stSelectbox div[data-baseweb="select"] {
         border-radius: 12px;
+        border: 2px solid #334155;
+        background-color: rgba(30, 41, 59, 0.7);
+    }
+    
+    .stSelectbox div[data-baseweb="select"] > div {
+        background-color: transparent; /* Fix inner select bg */
+        color: #f8fafc;
     }
 
     /* Gradient Material Icons */
@@ -81,7 +108,7 @@ st.markdown("""
         font-weight: 800;
         font-size: 18px;
         background: var(--brand-gradient);
-        color: white;
+        color: white !important;
         border: none;
         box-shadow: 0 4px 15px rgba(51, 51, 255, 0.4);
         transition: all 0.3s ease;
@@ -89,12 +116,28 @@ st.markdown("""
     div.stButton > button:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(51, 51, 255, 0.6);
-        color: white;
+        color: white !important;
+    }
+    
+    /* Download Button Style Override */
+    .stDownloadButton button {
+        background: rgba(30, 41, 59, 0.8) !important;
+        border: 1px solid #475569 !important;
+        color: #e2e8f0 !important;
+    }
+    
+    .stDownloadButton button:hover {
+        background: rgba(51, 65, 85, 1) !important;
+        border-color: #94a3b8 !important;
+        box-shadow: none !important;
+        transform: none !important;
     }
 
     /* Output Section Styling */
     .output-header {
-        color: var(--brand-color);
+        background: var(--brand-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         font-weight: 800;
         border-bottom: 2px solid var(--brand-color);
         padding-bottom: 10px;
@@ -106,6 +149,12 @@ st.markdown("""
         text-align: center;
         font-size: 5rem;
         margin-bottom: -20px;
+    }
+    
+    /* Sidebar Styling to match theme */
+    section[data-testid="stSidebar"] {
+        background-color: rgba(15, 23, 42, 0.8);
+        border-right: 1px solid rgba(255,255,255,0.05);
     }
     </style>
 """, unsafe_allow_html=True)
