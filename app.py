@@ -10,12 +10,12 @@ from tasks import create_tasks
 # -----------------------------
 st.set_page_config(
     page_title="CodeMentor AI",
-    page_icon="👨‍💻",
+    page_icon="https://cdn-icons-png.flaticon.com/512/4712/4712035.png",
     layout="centered" 
 )
 
 # -----------------------------
-# Custom CSS for UI Polish
+# Custom CSS for Vibrant UI
 # -----------------------------
 st.markdown("""
     <style>
@@ -24,6 +24,7 @@ st.markdown("""
         --brand-color: #3333ff;
     }
 
+    /* Glowing Title */
     .title-gradient {
         background: var(--brand-gradient);
         -webkit-background-clip: text;
@@ -34,22 +35,42 @@ st.markdown("""
         margin-bottom: 0px;
         padding-bottom: 5px;
     }
-    
     .hero-subtitle {
         text-align: center;
         font-size: 1.1rem;
         color: #888899;
         margin-bottom: 2rem;
+        letter-spacing: 1px;
+        font-weight: 600;
     }
-
+    
     /* Input Styling */
     .stTextArea textarea, .stTextInput input {
         border-radius: 12px;
         border: 2px solid #2b2b36;
+        transition: border-color 0.3s;
     }
-    
+    .stTextArea textarea:focus, .stTextInput input:focus {
+        border-color: var(--brand-color);
+        box-shadow: 0 0 10px rgba(51, 51, 255, 0.2);
+    }
     .stSelectbox div[data-baseweb="select"] {
         border-radius: 12px;
+    }
+
+    /* Gradient Material Icons */
+    .material-symbols-rounded {
+        background: var(--brand-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-block;
+    }
+
+    /* Button Icon Exception */
+    div.stButton > button .material-symbols-rounded {
+        background: none;
+        -webkit-text-fill-color: white;
+        color: white;
     }
     
     /* Main Action Button */
@@ -65,14 +86,13 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(51, 51, 255, 0.4);
         transition: all 0.3s ease;
     }
-    
     div.stButton > button:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(51, 51, 255, 0.6);
         color: white;
     }
 
-    /* Output Card Polish */
+    /* Output Section Styling */
     .output-header {
         color: var(--brand-color);
         font-weight: 800;
@@ -81,7 +101,7 @@ st.markdown("""
         margin-top: 30px;
         margin-bottom: 20px;
     }
-    
+
     .sidebar-logo {
         text-align: center;
         font-size: 5rem;
@@ -103,10 +123,9 @@ os.environ["GEMINI_API_KEY"] = api_key
 # Sidebar
 # -----------------------------
 with st.sidebar:
-    st.markdown("<div class='sidebar-logo'><span class='material-symbols-rounded' style='font-size: 80px;'>hub</span></div>", unsafe_allow_html=True)
-    st.markdown("<h2 style='text-align: center;'>CodeMentor AI</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #888;'>Your personal, AI-powered programming mentor.</p>", unsafe_allow_html=True)
-    
+    st.image("https://cdn-icons-png.flaticon.com/512/4712/4712035.png", width=90)
+    st.markdown("## CodeMentor AI")
+    st.markdown("Your personal, AI-powered programming mentor.")
     st.divider()
     st.markdown("### :material/schema: The AI Crew")
     st.markdown("""
@@ -115,19 +134,18 @@ with st.sidebar:
     🟣 **Reviewer:** Polishes final output.
     """)
     st.divider()
-    st.success(":material/workspace_premium: **PakAngel’s Hackathon Build**")
 
 # -----------------------------
-# Main Hero Section
+# Main UI: Hero Section
 # -----------------------------
 st.markdown("<h1 class='title-gradient'>CodeMentor AI</h1>", unsafe_allow_html=True)
 st.markdown("<div class='hero-subtitle'>01 / TELL US WHAT YOU WANT TO DO</div>", unsafe_allow_html=True)
 
 # -----------------------------
-# Form Inputs
+# Main UI: Input Cards
 # -----------------------------
 with st.container():
-    # 1. Action Type Selection
+    # 1. Action Type Dropdown
     task_type = st.selectbox(
         ":material/help: What do you need help with?",
         ["Generate code", "Learning roadmap", "Explain a concept", "Review my code"]
@@ -136,20 +154,20 @@ with st.container():
     col1, col2 = st.columns(2)
     
     with col1:
-        # 2. Programming Language Selection
+        # 2. Programming Language Dropdown
         language = st.selectbox(
             ":material/code: Programming language",
             ["Python", "JavaScript", "Java", "C++", "C#", "HTML/CSS", "SQL", "Other"]
         )
         
     with col2:
-        # 3. Experience Level Selection
+        # 3. Experience Level Dropdown
         level = st.selectbox(
             ":material/leaderboard: Your experience level",
             ["Beginner", "Intermediate", "Advanced"]
         )
 
-    # 4. Conditional Learning Time Slider (shown for roadmaps)
+    # 4. Conditional Learning Time Slider
     learning_time = 30
     if task_type == "Learning roadmap":
         learning_time = st.slider(
@@ -157,20 +175,20 @@ with st.container():
             min_value=5, max_value=100, value=30, step=5
         )
 
-    # 5. User Goal / Code Input
+    # 5. Question / Code Prompt Text Area
     question = st.text_area(
         ":material/chat: Describe your goal or paste your code",
-        placeholder="Example: Give me loops code or explain how variables work...",
+        placeholder="Example: Give me loops code or explain how functions work...",
         height=120
     )
 
 # -----------------------------
 # Run Agents
 # -----------------------------
-if st.button("✨ Build my result", type="primary"):
+if st.button(":material/auto_awesome: Build my result", type="primary"):
 
     if not question.strip():
-        st.warning(":material/warning: Please describe your goal or paste code to continue.")
+        st.warning(":material/warning: Please describe your goal or paste your code to continue.")
         st.stop()
 
     inputs = {
@@ -185,11 +203,11 @@ if st.button("✨ Build my result", type="primary"):
         st.divider()
         with st.status(":material/smart_toy: **Initializing CodeMentor Agents...**", expanded=True) as status:
             
-            st.write(":material/check_circle: Setting up environment & context...")
+            st.write(":material/check_circle: Loading environment & task parameters...")
             (coding_agent, learning_agent, reviewer_agent) = create_agents(api_key)
             (coding_task, roadmap_task, review_task) = create_tasks(coding_agent, learning_agent, reviewer_agent)
 
-            st.write(":material/verified: Agents are online and collaborating...")
+            st.write(":material/verified: Coding Expert, Learning Planner, and Reviewer are online.")
             
             crew = Crew(
                 agents=[coding_agent, learning_agent, reviewer_agent],
@@ -198,22 +216,24 @@ if st.button("✨ Build my result", type="primary"):
                 verbose=False
             )
 
-            st.write(":material/hourglass_top: Generating your personalized output...")
+            st.write(":material/hourglass_top: Agents are collaborating to generate your result...")
             result = crew.kickoff(inputs=inputs)
             
             status.update(label=":material/auto_awesome: Result Ready!", state="complete", expanded=False)
 
         # -------------------------
-        # Display Output & Download
+        # Display Final Result
         # -------------------------
-        st.markdown("<h2 class='output-header'>🎓 Result</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 class='output-header'>🎓 Your Output</h2>", unsafe_allow_html=True)
         
         output_text = result.raw if hasattr(result, "raw") else str(result)
+        
+        st.info(":material/tips_and_updates: Here is the output generated by your AI mentors:")
         st.markdown(output_text)
 
         st.divider()
-        
-        # 6. Download as Markdown Feature
+
+        # 6. Download Output as Markdown File
         st.download_button(
             label="⬇️ Download result as Markdown",
             data=output_text,
