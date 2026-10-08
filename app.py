@@ -65,7 +65,7 @@ st.markdown("""
     .hero-subtitle {
         text-align: center;
         font-size: 1.1rem;
-        color: #94a3b8 !important; /* Lighter subtitle color for dark bg */
+        color: #94a3b8 !important;
         margin-bottom: 2rem;
         letter-spacing: 1px;
         font-weight: 600;
@@ -75,7 +75,7 @@ st.markdown("""
     .stTextArea textarea, .stTextInput input {
         border-radius: 12px;
         border: 2px solid #334155;
-        background-color: rgba(30, 41, 59, 0.7); /* Slightly transparent dark inputs */
+        background-color: rgba(30, 41, 59, 0.7);
         color: #f8fafc;
         transition: border-color 0.3s, background-color 0.3s;
     }
@@ -91,29 +91,13 @@ st.markdown("""
         border: 2px solid #334155;
         background-color: rgba(30, 41, 59, 0.7);
     }
-    
     .stSelectbox div[data-baseweb="select"] > div {
-        background-color: transparent; /* Fix inner select bg */
+        background-color: transparent;
         color: #f8fafc;
     }
 
-    /* Gradient Material Icons */
-    .material-symbols-rounded {
-        background: var(--brand-gradient);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        display: inline-block;
-    }
-
-    /* Button Icon Exception */
-    div.stButton > button .material-symbols-rounded {
-        background: none;
-        -webkit-text-fill-color: white;
-        color: white;
-    }
-    
-    /* Main Action Button */
-    div.stButton > button {
+    /* Main Action Button (Only in Main Body) */
+    section[data-testid="stMain"] div.stButton > button {
         width: 100%;
         border-radius: 12px;
         height: 55px;
@@ -125,20 +109,53 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(51, 51, 255, 0.4);
         transition: all 0.3s ease;
     }
-    div.stButton > button:hover {
+    section[data-testid="stMain"] div.stButton > button:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(51, 51, 255, 0.6);
         color: white !important;
     }
-    
-    /* Sidebar History Button Override */
-    section[data-testid="stSidebar"] div.stButton > button {
-        height: 45px;
-        font-size: 14px;
-        font-weight: 600;
-        justify-content: flex-start;
-        padding-left: 15px;
-        margin-bottom: 5px;
+
+    /* =========================================
+       SIDEBAR "TEXT-LIKE" BUTTON STYLING
+       ========================================= */
+       
+    /* Unselected History Items (Secondary Buttons) */
+    section[data-testid="stSidebar"] div.stButton > button[kind="secondary"] {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        color: #94a3b8 !important; /* Muted gray text */
+        justify-content: flex-start !important;
+        text-align: left !important;
+        padding: 6px 10px !important;
+        font-weight: 500 !important;
+        height: auto !important;
+        min-height: 0px !important;
+    }
+    section[data-testid="stSidebar"] div.stButton > button[kind="secondary"]:hover {
+        color: #ffffff !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        transform: none !important;
+    }
+
+    /* Selected Active History Item (Primary Buttons) */
+    section[data-testid="stSidebar"] div.stButton > button[kind="primary"] {
+        background: rgba(51, 51, 255, 0.15) !important;
+        border: none !important;
+        border-left: 3px solid var(--brand-color) !important;
+        border-radius: 0px 6px 6px 0px !important;
+        box-shadow: none !important;
+        color: #ffffff !important; /* Bright white text */
+        justify-content: flex-start !important;
+        text-align: left !important;
+        padding: 6px 10px !important;
+        font-weight: 700 !important;
+        height: auto !important;
+        min-height: 0px !important;
+    }
+    section[data-testid="stSidebar"] div.stButton > button[kind="primary"]:hover {
+        transform: none !important;
+        box-shadow: none !important;
     }
 
     /* Output Section Styling */
@@ -153,13 +170,7 @@ st.markdown("""
         margin-bottom: 20px;
     }
 
-    .sidebar-logo {
-        text-align: center;
-        font-size: 5rem;
-        margin-bottom: -20px;
-    }
-    
-    /* Sidebar Styling to match theme */
+    /* Sidebar Theme */
     section[data-testid="stSidebar"] {
         background-color: rgba(15, 23, 42, 0.8);
         border-right: 1px solid rgba(255,255,255,0.05);
@@ -223,13 +234,12 @@ with st.sidebar:
     if len(st.session_state.chat_history) == 0:
         st.caption("No history yet. Start generating!")
     else:
-        # Loop through history to create clickable buttons
+        # Loop through history to create clickable text links
         for i, session in enumerate(st.session_state.chat_history):
-            # Clean up and truncate the text for the button
             prompt_text = session.get("question", "Previous Query").replace('\n', ' ')
             short_title = prompt_text[:28] + ("..." if len(prompt_text) > 28 else "")
             
-            # Change button style if it is the currently viewed one
+            # Primary = Selected (Highlighted style), Secondary = Unselected (Plain text style)
             btn_type = "primary" if st.session_state.selected_chat_index == i else "secondary"
             
             if st.button(f"💬 {short_title}", key=f"history_btn_{i}", use_container_width=True, type=btn_type):
@@ -237,7 +247,7 @@ with st.sidebar:
                 st.rerun()
                 
     st.divider()
-    if st.button("🗑️ Clear All History", use_container_width=True):
+    if st.button("🗑️ Clear All History", use_container_width=True, type="secondary"):
         st.session_state.chat_history = []
         st.session_state.selected_chat_index = None
         st.rerun()
@@ -249,10 +259,9 @@ st.markdown("<h1 class='title-gradient'>CodeMentor AI</h1>", unsafe_allow_html=T
 st.markdown("<div class='hero-subtitle'>WHAT ARE WE BUILDING?</div>", unsafe_allow_html=True)
 
 # -----------------------------
-# Main UI: Input Cards (Always visible to create new requests)
+# Main UI: Input Cards (Always visible)
 # -----------------------------
 with st.container():
-    # 1. Action Type Dropdown
     task_type = st.selectbox(
         ":material/help: What would you like to focus on?",
         ["Generate code", "Learning roadmap", "Explain a concept", "Review my code"]
@@ -261,20 +270,17 @@ with st.container():
     col1, col2 = st.columns(2)
     
     with col1:
-        # 2. Programming Language Dropdown
         language = st.selectbox(
             ":material/code: Programming language",
             ["Python", "JavaScript", "Java", "C++", "C#", "HTML/CSS", "SQL", "Other"]
         )
         
     with col2:
-        # 3. Experience Level Dropdown
         level = st.selectbox(
             ":material/leaderboard: Experience level",
             ["Beginner", "Intermediate", "Advanced"]
         )
 
-    # 4. Conditional Learning Time Slider
     learning_time = 30
     if task_type == "Learning roadmap":
         learning_time = st.slider(
@@ -282,7 +288,6 @@ with st.container():
             min_value=5, max_value=100, value=30, step=5
         )
 
-    # 5. Question / Code Prompt Text Area
     question = st.text_area(
         ":material/chat: Describe your goal or paste your code",
         placeholder="Example: Give me loops code or explain how functions work...",
@@ -292,7 +297,7 @@ with st.container():
 # -----------------------------
 # Run Generation Action
 # -----------------------------
-if st.button(":material/auto_awesome: Generate New Result", type="primary"):
+if st.button(":material/auto_awesome: Generate Result", type="primary"):
     if not question.strip():
         st.warning(":material/warning: Please describe your goal or paste your code to continue.")
         st.stop()
@@ -335,7 +340,6 @@ if st.button(":material/auto_awesome: Generate New Result", type="primary"):
 if st.session_state.selected_chat_index is not None and len(st.session_state.chat_history) > 0:
     st.markdown("<h2 class='output-header'>🎓 Your Mentorship Session</h2>", unsafe_allow_html=True)
     
-    # Retrieve the specific session the user selected
     active_session = st.session_state.chat_history[st.session_state.selected_chat_index]
     
     with st.chat_message("user"):
