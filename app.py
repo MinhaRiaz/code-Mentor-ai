@@ -174,7 +174,7 @@ with st.sidebar:
 # Main UI: Hero Section
 # -----------------------------
 st.markdown("<h1 class='title-gradient'>CodeMentor AI</h1>", unsafe_allow_html=True)
-st.markdown("<div class='hero-subtitle'>01 / TELL US WHAT YOU WANT TO DO</div>", unsafe_allow_html=True)
+st.markdown("<div class='hero-subtitle'>WHAT ARE WE BUILDING?</div>", unsafe_allow_html=True)
 
 # -----------------------------
 # Main UI: Input Cards
