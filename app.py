@@ -266,7 +266,7 @@ with st.sidebar:
 # Main UI: Hero Section
 # -----------------------------
 st.markdown("<h1 class='title-gradient'>CodeMentor AI</h1>", unsafe_allow_html=True)
-st.markdown("<div class='hero-subtitle'>WHAT ARE WE BUILDING?</div>", unsafe_allow_html=True)
+st.markdown("<div class='hero-subtitle'>WHAT ARE WE BUILDING</div>", unsafe_allow_html=True)
 
 # -----------------------------
 # Main UI: Input Cards
@@ -307,7 +307,7 @@ with st.container():
 # -----------------------------
 # Run Generation Action
 # -----------------------------
-if st.button(":material/auto_awesome: Generate New Result", type="primary"):
+if st.button(":material/auto_awesome: Generate Now", type="primary"):
     if not question.strip():
         st.warning(":material/warning: Please describe your goal or paste your code to continue.")
         st.stop()
