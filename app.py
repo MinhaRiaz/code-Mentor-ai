@@ -18,7 +18,10 @@ st.set_page_config(
 # Initialize Session State
 # -----------------------------
 if "chat_history" not in st.session_state:
+    # Now storing history as a list of dictionaries, each representing a full Q&A session
     st.session_state.chat_history = []
+if "selected_chat_index" not in st.session_state:
+    st.session_state.selected_chat_index = None
 
 # -----------------------------
 # Custom CSS for Vibrant UI
@@ -124,6 +127,16 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(51, 51, 255, 0.6);
         color: white !important;
     }
+    
+    /* Sidebar History Button Override */
+    section[data-testid="stSidebar"] div.stButton > button {
+        height: 45px;
+        font-size: 14px;
+        font-weight: 600;
+        justify-content: flex-start;
+        padding-left: 15px;
+        margin-bottom: 5px;
+    }
 
     /* Output Section Styling */
     .output-header {
@@ -202,19 +215,28 @@ with st.sidebar:
     """)
     st.divider()
     
-    # --- Sidebar History Section ---
+    # --- Clickable Sidebar History Section ---
     st.markdown("### 📜 Session History")
     if len(st.session_state.chat_history) == 0:
         st.caption("No history yet. Start generating!")
     else:
-        for i, msg in enumerate(st.session_state.chat_history):
-            if msg["role"] == "user":
-                # Show a truncated version of the user's prompt in the sidebar
-                st.caption(f"📝 **Prompt:** {msg['content'][:40]}...")
+        # Loop through history to create clickable buttons
+        for i, session in enumerate(st.session_state.chat_history):
+            # Clean up and truncate the text for the button
+            prompt_text = session["question"].replace('\n', ' ')
+            short_title = prompt_text[:28] + ("..." if len(prompt_text) > 28 else "")
+            
+            # Change button style if it is the currently viewed one
+            btn_type = "primary" if st.session_state.selected_chat_index == i else "secondary"
+            
+            if st.button(f"💬 {short_title}", key=f"history_btn_{i}", use_container_width=True, type=btn_type):
+                st.session_state.selected_chat_index = i
+                st.rerun()
                 
     st.divider()
-    if st.button("🗑️ Clear History", use_container_width=True):
+    if st.button("🗑️ Clear All History", use_container_width=True):
         st.session_state.chat_history = []
+        st.session_state.selected_chat_index = None
         st.rerun()
 
 # -----------------------------
@@ -224,7 +246,7 @@ st.markdown("<h1 class='title-gradient'>CodeMentor AI</h1>", unsafe_allow_html=T
 st.markdown("<div class='hero-subtitle'>WHAT ARE WE BUILDING?</div>", unsafe_allow_html=True)
 
 # -----------------------------
-# Main UI: Input Cards (Always visible)
+# Main UI: Input Cards (Always visible to create new requests)
 # -----------------------------
 with st.container():
     # 1. Action Type Dropdown
@@ -267,7 +289,7 @@ with st.container():
 # -----------------------------
 # Run Generation Action
 # -----------------------------
-if st.button(":material/auto_awesome: Generate", type="primary"):
+if st.button(":material/auto_awesome: Generate New Result", type="primary"):
     if not question.strip():
         st.warning(":material/warning: Please describe your goal or paste your code to continue.")
         st.stop()
@@ -284,10 +306,16 @@ if st.button(":material/auto_awesome: Generate", type="primary"):
         st.divider()
         output_text = run_codementor_agents(inputs)
         
-        # Save inputs and outputs to history
-        st.session_state.chat_history.append({"role": "user", "content": question})
-        st.session_state.chat_history.append({"role": "ai", "content": output_text, "context": inputs})
-        # Rerun to update the display (including sidebar history)
+        # Save a grouped session object to history
+        new_session = {
+            "question": question,
+            "answer": output_text,
+            "inputs": inputs
+        }
+        st.session_state.chat_history.append(new_session)
+        
+        # Automatically select and view the newly generated session
+        st.session_state.selected_chat_index = len(st.session_state.chat_history) - 1
         st.rerun()
 
     except Exception as e:
@@ -299,16 +327,16 @@ if st.button(":material/auto_awesome: Generate", type="primary"):
             st.code(error_msg)
 
 # -----------------------------
-# Display Main Feed History
+# Display Currently Selected History Item
 # -----------------------------
-if len(st.session_state.chat_history) > 0:
+if st.session_state.selected_chat_index is not None and len(st.session_state.chat_history) > 0:
     st.markdown("<h2 class='output-header'>🎓 Your Mentorship Session</h2>", unsafe_allow_html=True)
     
-    # Render all past messages directly below the form
-    for message in st.session_state.chat_history:
-        if message["role"] == "user":
-            with st.chat_message("user"):
-                st.write(message["content"])
-        else:
-            with st.chat_message("assistant"):
-                st.info(message["content"])
+    # Retrieve the specific session the user selected
+    active_session = st.session_state.chat_history[st.session_state.selected_chat_index]
+    
+    with st.chat_message("user"):
+        st.write(active_session["question"])
+        
+    with st.chat_message("assistant"):
+        st.info(active_session["answer"])
