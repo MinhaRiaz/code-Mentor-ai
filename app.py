@@ -15,6 +15,12 @@ st.set_page_config(
 )
 
 # -----------------------------
+# Initialize Session State
+# -----------------------------
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+
+# -----------------------------
 # Custom CSS for Vibrant UI
 # -----------------------------
 st.markdown("""
@@ -155,6 +161,31 @@ if not api_key:
 os.environ["GEMINI_API_KEY"] = api_key
 
 # -----------------------------
+# Helper Function to Run Agents
+# -----------------------------
+def run_codementor_agents(inputs_dict):
+    with st.status(":material/smart_toy: **Initializing CodeMentor Agents...**", expanded=True) as status:
+        st.write(":material/check_circle: Loading environment & task parameters...")
+        (coding_agent, learning_agent, reviewer_agent) = create_agents(api_key)
+        (coding_task, roadmap_task, review_task) = create_tasks(coding_agent, learning_agent, reviewer_agent)
+
+        st.write(":material/verified: Coding Expert, Learning Planner, and Reviewer are online.")
+        
+        crew = Crew(
+            agents=[coding_agent, learning_agent, reviewer_agent],
+            tasks=[coding_task, roadmap_task, review_task],
+            process=Process.sequential,
+            verbose=False
+        )
+
+        st.write(":material/hourglass_top: Agents are collaborating to generate your result...")
+        result = crew.kickoff(inputs=inputs_dict)
+        
+        status.update(label=":material/auto_awesome: Result Ready!", state="complete", expanded=False)
+        
+        return result.raw if hasattr(result, "raw") else str(result)
+
+# -----------------------------
 # Sidebar
 # -----------------------------
 with st.sidebar:
@@ -168,6 +199,9 @@ with st.sidebar:
     🔵 **Learning Planner:** Builds roadmaps.\n
     🟣 **Reviewer:** Polishes final output.
     """)
+    if st.button("🗑️ Clear History"):
+        st.session_state.chat_history = []
+        st.rerun()
     st.divider()
 
 # -----------------------------
@@ -177,101 +211,117 @@ st.markdown("<h1 class='title-gradient'>CodeMentor AI</h1>", unsafe_allow_html=T
 st.markdown("<div class='hero-subtitle'>WHAT ARE WE BUILDING?</div>", unsafe_allow_html=True)
 
 # -----------------------------
-# Main UI: Input Cards
+# Main UI: Input Cards (Hides after first submission)
 # -----------------------------
-with st.container():
-    # 1. Action Type Dropdown
-    task_type = st.selectbox(
-        ":material/help: What would you like to focus on?",
-        ["Generate code", "Learning roadmap", "Explain a concept", "Review my code"]
-    )
-
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        # 2. Programming Language Dropdown
-        language = st.selectbox(
-            ":material/code: Programming language",
-            ["Python", "JavaScript", "Java", "C++", "C#", "HTML/CSS", "SQL", "Other"]
+if len(st.session_state.chat_history) == 0:
+    with st.container():
+        # 1. Action Type Dropdown
+        task_type = st.selectbox(
+            ":material/help: What would you like to focus on?",
+            ["Generate code", "Learning roadmap", "Explain a concept", "Review my code"]
         )
+
+        col1, col2 = st.columns(2)
         
-    with col2:
-        # 3. Experience Level Dropdown
-        level = st.selectbox(
-            ":material/leaderboard: Experience level",
-            ["Beginner", "Intermediate", "Advanced"]
-        )
-
-    # 4. Conditional Learning Time Slider
-    learning_time = 30
-    if task_type == "Learning roadmap":
-        learning_time = st.slider(
-            ":material/schedule: Learning time (hours/days allocated for roadmap)",
-            min_value=5, max_value=100, value=30, step=5
-        )
-
-    # 5. Question / Code Prompt Text Area
-    question = st.text_area(
-        ":material/chat: Describe your goal or paste your code",
-        placeholder="Example: Give me loops code or explain how functions work...",
-        height=120
-    )
-
-# -----------------------------
-# Run Agents
-# -----------------------------
-if st.button(":material/auto_awesome: Generate", type="primary"):
-
-    if not question.strip():
-        st.warning(":material/warning: Please describe your goal or paste your code to continue.")
-        st.stop()
-
-    inputs = {
-        "task_type": task_type,
-        "language": language,
-        "level": level,
-        "learning_time": str(learning_time),
-        "question": question
-    }
-
-    try:
-        st.divider()
-        with st.status(":material/smart_toy: **Initializing CodeMentor Agents...**", expanded=True) as status:
+        with col1:
+            # 2. Programming Language Dropdown
+            language = st.selectbox(
+                ":material/code: Programming language",
+                ["Python", "JavaScript", "Java", "C++", "C#", "HTML/CSS", "SQL", "Other"]
+            )
             
-            st.write(":material/check_circle: Loading environment & task parameters...")
-            (coding_agent, learning_agent, reviewer_agent) = create_agents(api_key)
-            (coding_task, roadmap_task, review_task) = create_tasks(coding_agent, learning_agent, reviewer_agent)
-
-            st.write(":material/verified: Coding Expert, Learning Planner, and Reviewer are online.")
-            
-            crew = Crew(
-                agents=[coding_agent, learning_agent, reviewer_agent],
-                tasks=[coding_task, roadmap_task, review_task],
-                process=Process.sequential,
-                verbose=False
+        with col2:
+            # 3. Experience Level Dropdown
+            level = st.selectbox(
+                ":material/leaderboard: Experience level",
+                ["Beginner", "Intermediate", "Advanced"]
             )
 
-            st.write(":material/hourglass_top: Agents are collaborating to generate your result...")
-            result = crew.kickoff(inputs=inputs)
+        # 4. Conditional Learning Time Slider
+        learning_time = 30
+        if task_type == "Learning roadmap":
+            learning_time = st.slider(
+                ":material/schedule: Learning time (hours/days allocated for roadmap)",
+                min_value=5, max_value=100, value=30, step=5
+            )
+
+        # 5. Question / Code Prompt Text Area
+        question = st.text_area(
+            ":material/chat: Describe your goal or paste your code",
+            placeholder="Example: Give me loops code or explain how functions work...",
+            height=120
+        )
+
+    # -----------------------------
+    # Initial Run Button
+    # -----------------------------
+    if st.button(":material/auto_awesome: Generate", type="primary"):
+        if not question.strip():
+            st.warning(":material/warning: Please describe your goal or paste your code to continue.")
+            st.stop()
+
+        inputs = {
+            "task_type": task_type,
+            "language": language,
+            "level": level,
+            "learning_time": str(learning_time),
+            "question": question
+        }
+
+        try:
+            st.divider()
+            output_text = run_codementor_agents(inputs)
             
-            status.update(label=":material/auto_awesome: Result Ready!", state="complete", expanded=False)
+            # Save inputs and outputs to history
+            st.session_state.chat_history.append({"role": "user", "content": question})
+            st.session_state.chat_history.append({"role": "ai", "content": output_text, "context": inputs})
+            st.rerun()
 
-        # -------------------------
-        # Display Final Result
-        # -------------------------
-        st.markdown("<h2 class='output-header'>🎓 Your Output</h2>", unsafe_allow_html=True)
-        
-        output_text = result.raw if hasattr(result, "raw") else str(result)
-        
-        st.info(":material/tips_and_updates: Here is the output generated by your AI mentors:")
-        st.markdown(output_text)
+        except Exception as e:
+            error_msg = str(e)
+            if "503" in error_msg or "high demand" in error_msg or "UNAVAILABLE" in error_msg:
+                st.warning(":material/traffic: Google's AI servers are currently experiencing high traffic. Please try again.")
+            else:
+                st.error(":material/error: Something went wrong.")
+                st.code(error_msg)
 
-    except Exception as e:
-        error_msg = str(e)
-        if "503" in error_msg or "high demand" in error_msg or "UNAVAILABLE" in error_msg:
-            st.warning(":material/traffic: Google's AI servers are currently experiencing high traffic. Please try again.")
-            if st.button(":material/refresh: Retry Request"):
-                st.rerun()
+# -----------------------------
+# Display History & Follow-Up Bar
+# -----------------------------
+if len(st.session_state.chat_history) > 0:
+    st.markdown("<h2 class='output-header'>🎓 Your Mentorship Session</h2>", unsafe_allow_html=True)
+    
+    # Render all past messages
+    for message in st.session_state.chat_history:
+        if message["role"] == "user":
+            with st.chat_message("user"):
+                st.write(message["content"])
         else:
-            st.error(":material/error: Something went wrong.")
-            st.code(error_msg)
+            with st.chat_message("assistant"):
+                st.info(message["content"])
+
+    # Bottom sticky chat bar for follow-ups
+    follow_up = st.chat_input("Ask a follow-up question or generate more code...")
+    
+    if follow_up:
+        # Save new user request
+        st.session_state.chat_history.append({"role": "user", "content": follow_up})
+        
+        # Inherit settings from the very first AI message context
+        first_ai_msg = next((msg for msg in st.session_state.chat_history if msg["role"] == "ai"), None)
+        
+        new_inputs = {
+            "task_type": "Follow-up Question",
+            "language": first_ai_msg["context"]["language"] if first_ai_msg else "Python",
+            "level": first_ai_msg["context"]["level"] if first_ai_msg else "Intermediate",
+            "learning_time": first_ai_msg["context"]["learning_time"] if first_ai_msg else "30",
+            "question": f"Previous context exists. User's new follow-up request: {follow_up}"
+        }
+
+        try:
+            output_text = run_codementor_agents(new_inputs)
+            st.session_state.chat_history.append({"role": "ai", "content": output_text, "context": new_inputs})
+            st.rerun()
+            
+        except Exception as e:
+            st.error(f":material/error: Something went wrong. Error: {str(e)}")
