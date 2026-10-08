@@ -18,8 +18,11 @@ st.set_page_config(
 # Initialize Session State
 # -----------------------------
 if "chat_history" not in st.session_state:
-    # Now storing history as a list of dictionaries, each representing a full Q&A session
     st.session_state.chat_history = []
+# SAFETY CHECK: If old history format is detected, wipe it clean to prevent KeyErrors
+elif len(st.session_state.chat_history) > 0 and "question" not in st.session_state.chat_history[0]:
+    st.session_state.chat_history = []
+
 if "selected_chat_index" not in st.session_state:
     st.session_state.selected_chat_index = None
 
@@ -223,7 +226,7 @@ with st.sidebar:
         # Loop through history to create clickable buttons
         for i, session in enumerate(st.session_state.chat_history):
             # Clean up and truncate the text for the button
-            prompt_text = session["question"].replace('\n', ' ')
+            prompt_text = session.get("question", "Previous Query").replace('\n', ' ')
             short_title = prompt_text[:28] + ("..." if len(prompt_text) > 28 else "")
             
             # Change button style if it is the currently viewed one
@@ -336,7 +339,7 @@ if st.session_state.selected_chat_index is not None and len(st.session_state.cha
     active_session = st.session_state.chat_history[st.session_state.selected_chat_index]
     
     with st.chat_message("user"):
-        st.write(active_session["question"])
+        st.write(active_session.get("question", "Unknown Question"))
         
     with st.chat_message("assistant"):
-        st.info(active_session["answer"])
+        st.info(active_session.get("answer", "Unknown Answer"))
