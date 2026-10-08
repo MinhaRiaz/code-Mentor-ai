@@ -182,7 +182,7 @@ st.markdown("<div class='hero-subtitle'>01 / TELL US WHAT YOU WANT TO DO</div>",
 with st.container():
     # 1. Action Type Dropdown
     task_type = st.selectbox(
-        ":material/help: What do you need help with?",
+        ":material/help: What would you like to focus on?",
         ["Generate code", "Learning roadmap", "Explain a concept", "Review my code"]
     )
 
@@ -198,7 +198,7 @@ with st.container():
     with col2:
         # 3. Experience Level Dropdown
         level = st.selectbox(
-            ":material/leaderboard: Your experience level",
+            ":material/leaderboard: Experience level",
             ["Beginner", "Intermediate", "Advanced"]
         )
 
