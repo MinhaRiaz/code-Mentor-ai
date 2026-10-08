@@ -46,9 +46,21 @@ st.markdown("""
         background-attachment: fixed;
     }
     
-    /* Adjust Text Colors for Dark Theme */
-    .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp label, .stApp span {
+    /* Adjust Text Colors for Dark Theme (REMOVED span so code colors work!) */
+    .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp label {
         color: #e2e8f0 !important;
+    }
+
+    /* Code Block Prominent Styling */
+    div[data-testid="stCodeBlock"] {
+        background-color: #0f172a !important; /* Darker background for code */
+        border: 1px solid #3333ff !important; /* Blue border to make it pop */
+        border-radius: 12px !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+    }
+    div[data-testid="stCodeBlock"] pre {
+        font-family: 'Fira Code', 'Courier New', monospace !important;
+        font-size: 15px !important;
     }
 
     /* Glowing Title */
@@ -119,12 +131,12 @@ st.markdown("""
        SIDEBAR "TEXT-LIKE" BUTTON STYLING
        ========================================= */
        
-    /* Unselected History Items (Secondary Buttons) */
+    /* Unselected History Items */
     section[data-testid="stSidebar"] div.stButton > button[kind="secondary"] {
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
-        color: #94a3b8 !important; /* Muted gray text */
+        color: #94a3b8 !important;
         justify-content: flex-start !important;
         text-align: left !important;
         padding: 6px 10px !important;
@@ -138,14 +150,14 @@ st.markdown("""
         transform: none !important;
     }
 
-    /* Selected Active History Item (Primary Buttons) */
+    /* Selected Active History Item */
     section[data-testid="stSidebar"] div.stButton > button[kind="primary"] {
         background: rgba(51, 51, 255, 0.15) !important;
         border: none !important;
         border-left: 3px solid var(--brand-color) !important;
         border-radius: 0px 6px 6px 0px !important;
         box-shadow: none !important;
-        color: #ffffff !important; /* Bright white text */
+        color: #ffffff !important;
         justify-content: flex-start !important;
         text-align: left !important;
         padding: 6px 10px !important;
@@ -234,12 +246,10 @@ with st.sidebar:
     if len(st.session_state.chat_history) == 0:
         st.caption("No history yet. Start generating!")
     else:
-        # Loop through history to create clickable text links
         for i, session in enumerate(st.session_state.chat_history):
             prompt_text = session.get("question", "Previous Query").replace('\n', ' ')
             short_title = prompt_text[:28] + ("..." if len(prompt_text) > 28 else "")
             
-            # Primary = Selected (Highlighted style), Secondary = Unselected (Plain text style)
             btn_type = "primary" if st.session_state.selected_chat_index == i else "secondary"
             
             if st.button(f"💬 {short_title}", key=f"history_btn_{i}", use_container_width=True, type=btn_type):
@@ -259,7 +269,7 @@ st.markdown("<h1 class='title-gradient'>CodeMentor AI</h1>", unsafe_allow_html=T
 st.markdown("<div class='hero-subtitle'>WHAT ARE WE BUILDING?</div>", unsafe_allow_html=True)
 
 # -----------------------------
-# Main UI: Input Cards (Always visible)
+# Main UI: Input Cards
 # -----------------------------
 with st.container():
     task_type = st.selectbox(
@@ -297,7 +307,7 @@ with st.container():
 # -----------------------------
 # Run Generation Action
 # -----------------------------
-if st.button(":material/auto_awesome: Generate Result", type="primary"):
+if st.button(":material/auto_awesome: Generate New Result", type="primary"):
     if not question.strip():
         st.warning(":material/warning: Please describe your goal or paste your code to continue.")
         st.stop()
@@ -314,7 +324,6 @@ if st.button(":material/auto_awesome: Generate Result", type="primary"):
         st.divider()
         output_text = run_codementor_agents(inputs)
         
-        # Save a grouped session object to history
         new_session = {
             "question": question,
             "answer": output_text,
@@ -322,7 +331,6 @@ if st.button(":material/auto_awesome: Generate Result", type="primary"):
         }
         st.session_state.chat_history.append(new_session)
         
-        # Automatically select and view the newly generated session
         st.session_state.selected_chat_index = len(st.session_state.chat_history) - 1
         st.rerun()
 
